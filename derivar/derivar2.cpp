@@ -155,7 +155,7 @@ void derivar()
                 car = ord.at(i);
                 if(i<ord.length()-1)
                 {
-                    if ((ord.at(i) == '^')&&(!isdigit(ord.at(i+1)))) throw 1;
+                    if ((car == '^')&&(!isdigit(ord.at(i+1)))) throw 1;
                 }
                 if(isdigit(car))
                 {
@@ -239,8 +239,7 @@ void derivar()
 
 int main()
 {
-    bool seguir = true;
-    while(seguir)
+    while(true)
     {
         char opcion = menu();
 
@@ -251,10 +250,10 @@ int main()
             case 'a':
                 derivar();
                 break;
-            case'b':
+            case 'b':
                 ejemplo();
                 break;
-            case'c':
+            case 'c':
                 explicacion();
                 break;
         }
