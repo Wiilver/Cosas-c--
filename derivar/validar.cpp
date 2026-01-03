@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cctype>
-
+#include <list>
+#include <array>
 //f(x) = 32x^-3-8x^2+x+1
 
 std::string validar(std::string fun)
@@ -69,6 +70,67 @@ std::string validar(std::string fun)
     }
 
     return ord;
+}
+
+std::list<std::array<std::string,3>> hacerarreglo(std::string fun)
+{
+    std::list<std::array<std::string,3>> lista;
+    std::array<std::string,3> arr;
+    std::string num, coe, exp;
+    bool yava, yaex;
+    char car;
+
+
+    yava = yaex = false;
+    num = "";
+    
+    for(int i = 0; i < fun.length(); i++)
+    {
+        car = fun[i];
+        
+        if(isdigit(car)) num+=std::string(1,car);
+        else if(isalpha(car))
+        {
+            yava = true;
+            if(!num.empty()) coe = num;
+            else 
+            {
+                coe = "1";
+                num = "";   
+            } 
+        }
+        else if(car == '^') yaex=true;
+        else if((car=='-')||(car=='+'))
+        {
+            if (car=='-')
+            {
+                if(i>0)
+                {
+                    if(fun[i-1]=='^') 
+                    {
+                        num+="-";
+                        continue;
+                    }
+                }
+            }
+            if(yaex)
+            {
+                if(!num.empty()) 
+                {
+                    exp = num;
+                    num = "";
+                }
+                else exp = "1"; 
+            }
+            else exp = "1";
+            if(coe.empty())
+            {
+                coe = "1";
+            }
+        }
+    }
+
+    
 }
 
 int main()

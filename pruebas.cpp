@@ -1,8 +1,9 @@
 #include <iostream>
+#include <vector>
 
 int main()
 {
-    std::string a = "a";
-    std::cout<<a.back();
+    std::vector <int> a;
+    std::cout<<a.size();
     return 0;
 }
