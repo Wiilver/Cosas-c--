@@ -5,6 +5,11 @@
 #include <sstream>
 #include <iomanip>
 
+struct SinMatriz{};
+struct MatrizChica{};
+struct MatrizNoCuadrada{};
+struct SistemaImposible{};
+
 void impresion(const std::vector <std::vector<double>>& matriz)
 {
     int largo = 0;
@@ -202,6 +207,141 @@ std::vector <std::vector<double>> rellenar(std::vector <std::vector<double>> mat
 
 }
 
+std::vector <std::vector<double>> multiplicar(std::vector <std::vector<double>> matriz)
+{
+    int opc, valor;
+    while(true)
+    {
+        impresion(matriz);
+        try
+        {
+
+            std::cout<<"\nQue fila desea multiplicar (su matriz tiene "<<matriz.size()<<" elementos) : ";
+            std::cin>>opc;
+
+            if((opc<1)||(opc>matriz.size())) throw 1;
+
+            std::cout<<"\nIngrese el valor por el que quiera multiplicar los elementos de la fila "<<opc<<" : ";
+            std::cin>>valor;
+
+            if(valor == 0) throw 1;
+
+            for(int i = 0; i < matriz[0].size(); i++) matriz[opc-1][i] *= valor;
+            return matriz;
+        }
+        catch(...)
+        {
+            system("cls");
+            std::cout<<"Parece que hubo un problema con el dato que ingresaste, por favor, intentalo de nuevo\n";
+        }
+    }
+}
+
+std::vector <std::vector<double>> sumar(std::vector <std::vector<double>> matriz)
+{
+    int fila1, fila2;
+    while(true)
+    {
+        impresion(matriz);
+        try
+        {
+            std::cout<<"\nIntroduzca la fila que va a usar para sumar : ";
+            std::cin>>fila1;
+
+            if((fila1>matriz.size())||(fila1<1)) throw 1;
+
+            std::cout<<"\nAhora introduzca la fila a la que va a sumarle : ";
+            std::cin>>fila2;
+
+            if((fila2 <1)||(fila2 == fila1)||(fila2 > matriz.size())) throw 1;
+
+            for(int i = 0; i < matriz.size(); i++) matriz[fila2-1][i] += matriz[fila1-1][i];
+            return matriz;
+        }
+        catch(...)
+        {
+            system("cls");
+            std::cout<<"Parece que hubo un error con el dato que introdujiste, por favor, intentalo de nuevo\n\n";
+        }    
+    }
+}
+
+std::vector <std::vector<double>> restar(std::vector <std::vector<double>> matriz)
+{
+    int fila1, fila2;
+    while(true)
+    {
+        impresion(matriz);
+        try
+        {
+            std::cout<<"\nIntroduzca la fila que va a usar para restar : ";
+            std::cin>>fila1;
+
+            if((fila1>matriz.size())||(fila1<1)) throw 1;
+
+            std::cout<<"\nAhora introduzca la fila a la que va a restarle : ";
+            std::cin>>fila2;
+
+            if((fila2 < 1)||(fila2 == fila1)||(fila2 > matriz.size())) throw 1;
+
+            for(int i = 0; i < matriz.size(); i++) matriz[fila2-1][i] -= matriz[fila1-1][i];
+            return matriz;
+        }
+        catch(...)
+        {
+            system("cls");
+            std::cout<<"Parece que hubo un error con el dato que introdujiste, por favor, intentalo de nuevo\n\n";
+        }    
+    }
+}
+
+std::vector <std::vector<double>> intercambiar(std::vector <std::vector<double>> matriz)
+{
+    int fila1, fila2;
+    double valor;
+    
+    while(true)
+    {
+        impresion(matriz);
+        try
+        {
+            std::cout<<"\nIntroduzca la primera de las filas : ";
+            std::cin>>fila1;
+
+            if((fila1>matriz.size())||(fila1<1)) throw 1;
+
+            std::cout<<"\nAhora introduzca la segunda de las filas : ";
+            std::cin>>fila2;
+
+            if((fila2 <1)||(fila2 == fila1)||(fila2 > matriz.size())) throw 1;
+
+            for(int i = 0; i < matriz[0].size(); i++)
+            {
+                valor = matriz[fila1-1][i];
+                matriz[fila1-1][i] = matriz[fila2-1][i];
+                matriz[fila2-1][i] = valor;
+            }
+            return matriz;
+        }
+        catch(...)
+        {
+            system("cls");
+            std::cout<<"Parece que hubo un error con el dato que introdujiste, por favor, intentalo de nuevo\n\n";
+        }
+    }
+}
+
+//Me falta acabar estas 2
+void sistema(std::vector <std::vector<double>> matriz)
+{
+    
+}
+
+void determinante(std::vector <std::vector<double>> matriz)
+{
+
+}
+
 int main()
 {
     int opc;
@@ -227,27 +367,45 @@ int main()
                     matriz = crear(matriz, yx);
                     break;
                 case 2:
-                    if(matriz.size()==0) throw 1;
+                    if(matriz.size()==0) throw SinMatriz{};
                     matriz = rellenar(matriz);
                     break;
                 case 3:
+                    if(matriz.size()==0) throw SinMatriz{};
+                    matriz = multiplicar(matriz);
                     break;
                 case 4:
+                    if (matriz.size()<2) throw MatrizChica{};
+                    matriz = sumar(matriz);
                     break;
                 case 5:
+                    if (matriz.size()<2) throw MatrizChica{};
+                    matriz = restar(matriz);
                     break;
                 case 6:
+                    if (matriz.size()<2) throw MatrizChica{};
+                    matriz = intercambiar(matriz);
                     break;
                 case 7:
+                    if (matriz.size()<2) throw MatrizChica{};
+                    if(yx[0]<yx[1]-1) throw SistemaImposible{};
                     break;
                 case 8:
+                    if(yx[0]!=yx[1])throw MatrizNoCuadrada{};
+                    
                     break;
             }
         }
-        catch(...)
+        catch(SinMatriz)
         {
             system("cls");
             std::cout<<"Esta opcion necesita que ya tengas una matriz creada\nPresiona ENTER para continuar...";
+            std::cin>>opc;
+        }
+        catch(MatrizChica)
+        {
+            system("cls");
+            std::cout<<"Esta opcion necesita que tu matriz tenga dos filas o mas\nPresiona ENTER para continuar...";
             std::cin>>opc;
         }
 
