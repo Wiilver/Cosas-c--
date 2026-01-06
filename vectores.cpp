@@ -332,6 +332,33 @@ std::vector <std::vector<double>> intercambiar(std::vector <std::vector<double>>
 }
 
 //Me falta acabar estas 2
+
+void matriz(std::vector <std::vector<double>> matriz)
+{
+    bool ceros;
+    
+    for(int i = 0; i < matriz.size(); i++)
+    {
+        ceros = true;
+        for (int j = 0; j < matriz[0].size(); j++)
+        {
+            if(matriz[j][i]!=0) ceros = false;
+        }
+        if(ceros)
+        {
+            std::cout<<"Parece ser que tu matriz no es capaz de solucionarse ni de tener determinantes";
+            break;    
+        }
+    }
+    if(!ceros)
+    {
+        for(int i = 0; i < matriz.size(); i++)
+        {
+            
+        }
+    }
+}
+
 void sistema(std::vector <std::vector<double>> matriz)
 {
     
