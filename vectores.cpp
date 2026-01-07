@@ -332,6 +332,7 @@ std::vector <std::vector<double>> intercambiar(std::vector <std::vector<double>>
 }
 
 //Me falta acabar estas 2
+//Me sigue faktabdi gacerlo 
 
 void matriz(std::vector <std::vector<double>> matriz)
 {
