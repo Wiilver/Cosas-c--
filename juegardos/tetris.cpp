@@ -5,6 +5,29 @@
 #include <array>
 #include <unordered_map>
 
+
+/*
+Debo de ver logica para imprimir estas cosas
+| ##  | #### | # | ### | ## |   # | #   | ### |   # | #   | ## | #  |  ## |  # | ##  |
+| ##  |      | # | #   |  # | ### | #   |   # |   # | ### | #  | ## | ##  | ## |  ## |
+|     |      | # |     |  # |     | ##  |     |  ## |     | #  |  # |     | #  |     |
+|     |      | # |     |    |     |     |     |     |     |    |    |     |    |     |
+*/
+
+void hacer_figura(const int& x, const int& y, std::array<std::array<char, 10>, 20>& juego, const int& figura)
+{
+    /*
+    S Invertida 1
+    S 2
+    Cubo 3
+    L 4
+    L Invertida 5
+    Linea 6
+    Linea Acostada 7
+    */
+    
+}
+
 void menu()
 {
     std::chrono::milliseconds periodo = std::chrono::milliseconds(500);
@@ -30,8 +53,7 @@ void impresion(const std::array<std::array<char, 10>, 20>& juego)
 //Necesito pensar en como rotar las piezas
 int main()
 {
-    int tecla, x, y;
-    std::array<>
+    int tecla, x, y, figura;
     std::array<std::array<char, 10>, 20> juego;
     std::cout<<"Presione esc para salir...";
     while (true)
