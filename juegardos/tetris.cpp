@@ -1,10 +1,13 @@
 #include <iostream>
 #include <conio.h>
-#include <thread>
 #include <chrono>
 #include <array>
-#include <unordered_map>
 
+//Tambien necesitas acabar la rotacion y posiblemente cambiar el rellenar
+//Creo que se necesita 
+//En pendientes mas largos ocupamos una funcion que al fin de cada loop vea si hay filas, que las borre y que cambie el contenido de todas las superiores
+//Necesitamos una funcion que imprima las siguientes piezas en la parte derecha
+//Como mucho futuro estaria bien poder guardar la siguiente pieza con la 'c'
 
 /*
 Debo de ver logica para imprimir estas cosas
@@ -14,24 +17,95 @@ Debo de ver logica para imprimir estas cosas
 |     |      | # |     |    |     |     |     |     |     |    |    |     |    |     |
 */
 
-void hacer_figura(const int& x, const int& y, std::array<std::array<char, 10>, 20>& juego, const int& figura)
+void rellenar_figura(const int& x, const int& y, std::array<std::array<char, 10>, 20>& juego, const std::array<int, 4>& figura, const char& relleno)
 {
-    /*
-    S Invertida 1
-    S 2
-    Cubo 3
-    L 4
-    L Invertida 5
-    Linea 6
-    Linea Acostada 7
-    */
-    
+    int contador = 0;
+    if(figura[contador]==1)
+    {
+        juego[y][x] = relleno;
+        contador++;
+    } 
+    if(figura[contador]==2) juego[y][x] = relleno;
+    {
+        juego[y][x+1] = relleno;
+        contador++;
+    }
+    if(figura[contador]==3) juego[y][x] = relleno;
+    {
+        juego[y][x+2] = relleno;
+        contador++;
+    }
+    if(figura[contador]==4) juego[y][x] = relleno;
+    {
+        juego[y+1][x] = relleno;
+        contador++;
+    }
+    if(figura[contador]==5) juego[y][x] = relleno;
+    {
+        juego[y+1][x+1] = relleno;
+        contador++;
+    }
+    if(figura[contador]==6) juego[y][x] = relleno;
+    {
+        juego[y+1][x+2] = relleno;
+        contador++;
+    }
+    if(figura[contador]==7) juego[y][x] = relleno;
+    {
+        juego[y+2][x] = relleno;
+        contador++;
+    }
+    if(figura[contador]==8) juego[y][x] = relleno;
+    {
+        juego[y+2][x+1] = relleno;
+        contador++;
+    }
+    if(figura[contador]==9) juego[y][x] = relleno;
+    {
+        juego[y][x+3] = relleno;
+        contador++;
+    }
+    if(figura[contador]==0) juego[y][x] = relleno;
+    {
+        juego[y+3][x] = relleno;
+        contador++;
+    }
 }
 
-void menu()
+void rotacion(const int& x, const int& y, std::array<std::array<char, 10>, 20>& juego, const std::array<int, 4>& figura, const char& relleno)
 {
-    std::chrono::milliseconds periodo = std::chrono::milliseconds(500);
-    std::this_thread::sleep_for(periodo);
+    if()
+}
+
+void conseguir_tecla(char& tecla)
+{
+    int input;
+    input = _getch();
+
+    if ((tecla == 0)||(tecla == 224)) input = _getch();
+
+    switch(input)
+    {
+        case 119:
+        case 87:
+        case 72:
+            tecla = 'w';
+
+        case 97:
+        case 65:
+        case 75:
+            tecla = 'a';
+        
+        case 115:
+        case 83:
+        case 80:
+            tecla = 's';
+
+        case 100:
+        case 68:
+        case 77:
+            tecla = 'd';
+    }
 }
 
 void llenar(std::array<std::array<char, 10>, 20>& juego)
@@ -50,19 +124,56 @@ void impresion(const std::array<std::array<char, 10>, 20>& juego)
         std::cout<<'\n';
     }
 }
-//Necesito pensar en como rotar las piezas
+
 int main()
 {
-    int tecla, x, y, figura;
+    int input, x, y;
+    char tecla;
+    std::array<int, 4> figura;
     std::array<std::array<char, 10>, 20> juego;
+    std::chrono::duration<float, std::milli> lapso;
+    auto inicio = std::chrono::system_clock::now();
+    while(true)
+    {
+        if(_kbhit)
+        {
+            conseguir_tecla(tecla);
+            
+            switch(tecla)
+            {
+                case 'w'
+                    //Aqui es para rotar, necesitas hacer que se cambie la x o la y para que no salgan errores
+                    break;
+                case 'a'
+                    break;
+                case 's'
+                    //En este caso tienes que hacer que pueda bajar mas rapido, puedes intentar cambiado lo largo del timer
+                    break;
+                case 'd'
+                    //En ambos casos checar una vez mas para no salirse de la pantalla
+                    break;        
+            }
+        }
+
+
+        auto ahora = std::chrono::system_clock::now();
+        lapso = ahora-inicio;
+        if (lapso.count() > 500)
+        {
+            y++;
+
+        }
+        rellenar_figura(x,y,juego,figura,'#');
+    }
+    
     std::cout<<"Presione esc para salir...";
     while (true)
     {
         if(_kbhit())
         {
-            tecla = _getch();
-            std::cout<<"Tecla presionada "<<tecla<<"\n";
-            if (tecla==27) break;
+            input = _getch();
+            std::cout<<"Tecla presionada "<<input<<"\n";
+            if (input==27) break;
         }
     }
     return 0;
