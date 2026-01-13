@@ -20,6 +20,7 @@ Debo de ver logica para imprimir estas cosas
 void rellenar_figura(const int& x, const int& y, std::array<std::array<char, 10>, 20>& juego, const std::array<int, 4>& figura, const char& relleno)
 {
     int contador = 0;
+    
     if(figura[contador]==1)
     {
         juego[y][x] = relleno;
@@ -72,9 +73,19 @@ void rellenar_figura(const int& x, const int& y, std::array<std::array<char, 10>
     }
 }
 
-void rotacion(const int& x, const int& y, std::array<std::array<char, 10>, 20>& juego, const std::array<int, 4>& figura, const char& relleno)
-{
-    if()
+void rotacion(int& x, const int& y, std::array<int, 4>& figura, const std::array<std::array<char, 10>, 20> juego)
+{   
+    if(figura == std::array{1,2,3,9})
+    {
+        if(x>4) x = 4;
+    }
+    if(figura == std::array{1,4,7,0})
+    {
+        if(juego[y-3][x]!=' ')
+        {
+        }
+    }
+    if(figura == std::array {1,2,4,5})
 }
 
 void conseguir_tecla(char& tecla)
