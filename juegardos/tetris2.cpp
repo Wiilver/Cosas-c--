@@ -4,20 +4,17 @@
 #include <conio.h>
 #include <cstdlib>
 
-//Futuro: Debo de usar un using en ves de hardcodear las dimensiones del arreglo
+typedef std::array<std::array<char,10>,15> matriz;
 //Deberia de checar lo de hacer que no parpadee
-//Checar las funciones que no ocupan las referencias como tal
-//Debo de pasarlo a steady clock
 //De momento solo sirve para windows
+//Debo de hacer lo de que la x detecte si se puede mover o no sin importar la figura que tenga
 
-//Este codigo sera mas chiquito
-
-void rellenar(std::array<std::array<char,10>,15>& mapa)
+void rellenar(matriz& mapa)
 {
     for(int i = 0; i < mapa.size(); i ++) for (int j = 0; j < mapa[0].size(); j++) mapa[i][j] = ' ';
 }
 
-void imprimir(const std::array<std::array<char,10>,15>& mapa)
+void imprimir(const matriz& mapa)
 {
     for(int i = 0; i < mapa.size(); i ++)
     {
@@ -60,11 +57,19 @@ void conseguir_tecla(char& tecla)
     }
 }
 
-void cambiar_x(const int& y, int& x, const std::array<std::array<char, 10>, 15>& mapa, const char& tecla)
+void cambiar_x(const int y, int& x, const std::array<int,4>& figura,const matriz& mapa, const char& tecla)
 {
-    std::cout<<tecla;
+    bool sepuede;
+    int cacho1;
     if((tecla == 'a')&&(x > 0))
     {
+        if(figura[3]==9)
+        {
+
+        }
+        for(int i = 0; i < 3; i ++)
+        {
+        }
         if(mapa[y][x-1]==' ') x--;
     }
     else if((tecla == 'd')&&(x < mapa[0].size()-1))
@@ -73,7 +78,7 @@ void cambiar_x(const int& y, int& x, const std::array<std::array<char, 10>, 15>&
     }
 }
 
-void cambiar_y(int& y, const int& x, bool& piso, const std::array<std::array<char, 10>, 15>& mapa)
+void cambiar_y(int& y, const int x, bool& piso, const matriz& mapa)
 {
     if (y < mapa.size()-1)
     {
@@ -83,7 +88,7 @@ void cambiar_y(int& y, const int& x, bool& piso, const std::array<std::array<cha
     else piso = true;
 }
 
-void checar_linea(const int& y, bool& linea, const std::array<std::array<char, 10>, 15>& mapa)
+void checar_linea(const int y, bool& linea, const matriz& mapa)
 {
     linea = true;
     for(int i = 0; i < mapa[0].size(); i++) 
@@ -96,7 +101,7 @@ void checar_linea(const int& y, bool& linea, const std::array<std::array<char, 1
     }
 }
 
-void completo_linea(const int& y, bool& linea, std::array<std::array<char,10>,15>& mapa)
+void completo_linea(const int y, bool& linea, matriz& mapa)
 {
     linea = false;
     for(int i = y; i > 0; i --)
@@ -106,17 +111,82 @@ void completo_linea(const int& y, bool& linea, std::array<std::array<char,10>,15
     for(int i = 0; i < mapa[0].size(); i ++) mapa [0][i] = ' ';
 }
 
+void poner_figura(const int y, const int x, const std::array<int, 4>& figura, matriz& mapa, char relleno)
+{
+    int contador = 0;
+    
+    if(figura[contador]==1)
+    {
+        mapa[y][x] = relleno;
+        contador++;
+    } 
+    if(figura[contador]==2)
+    {
+        mapa[y][x+1] = relleno;
+        contador++;
+    }
+    if(figura[contador]==3)
+    {
+        mapa[y][x+2] = relleno;
+        contador++;
+    }
+    if(figura[contador]==4)
+    {
+        mapa[y+1][x] = relleno;
+        contador++;
+        if (contador == 4) return;
+    }
+    if(figura[contador]==5)
+    {
+        mapa[y+1][x+1] = relleno;
+        contador++;
+        if (contador == 4) return;
+    }
+    if(figura[contador]==6)
+    {
+        mapa[y+1][x+2] = relleno;
+        contador++;
+        if (contador == 4) return;
+    }
+    if(figura[contador]==7)
+    {
+        mapa[y+2][x] = relleno;
+        contador++;
+        if (contador == 4) return;
+    }
+    if(figura[contador]==8)
+    {
+        mapa[y+2][x+1] = relleno;
+        contador++;
+        if (contador == 4) return;
+    }
+    if(figura[contador]==9)
+    {
+        mapa[y][x+3] = relleno;
+        contador++;
+        if (contador == 4) return;
+    }
+    if(figura[contador]==0)
+    {
+        mapa[y+3][x] = relleno;
+        contador++;
+    }
+}
+
 int main()
 {
     int x, y, tiempo;
     bool piso, linea;
     char tecla;
 
-    std::array<std::array<char, 10>, 15> mapa;
-    std::chrono::system_clock::time_point inicio, actual;
+    matriz mapa;
+    std::array<int, 4> figura;
+    std::chrono::steady_clock::time_point inicio, actual;
     std::chrono::duration<double, std::milli> lapso;
     
     linea = piso = false;
+
+    figura = {1,2,4,5};
 
     y = 0;
     x = 5;
@@ -125,7 +195,7 @@ int main()
     rellenar(mapa);
     imprimir(mapa);
     
-    inicio = std::chrono::system_clock::now();
+    inicio = std::chrono::steady_clock::now();
     
     while(true)
     {
@@ -137,40 +207,40 @@ int main()
             {
                 case 'a':
                 case 'd':
-                    mapa[y][x] = ' ';
+                    poner_figura(y,x,figura,mapa,' ');
                     cambiar_x(y, x, mapa, tecla);
-                    mapa[y][x] = '#';
+                    poner_figura(y,x,figura,mapa,'#');
 
                     system("cls");
                     imprimir(mapa);
                     break;
                     
                 case 's':
-                    tiempo = 100;
+                    tiempo = 50;
                     break;
             }
         }
 
-        actual = std::chrono::system_clock::now();
+        actual = std::chrono::steady_clock::now();
         lapso = actual-inicio;
         if(lapso.count() > tiempo)
         {
             system("cls");
-            mapa[y][x] = ' ';
+            poner_figura(y,x,figura,mapa,' ');
             cambiar_y(y, x, piso, mapa);
             if(piso)
             {   
-                mapa[y][x] = '#';
+                poner_figura(y,x,figura,mapa,'#');
                 checar_linea(y,linea,mapa);
                 if(linea)completo_linea(y, linea, mapa);
                 y = 0;
                 x = 5;
                 piso = false;
             }
-            mapa[y][x] = '#';
+            poner_figura(y,x,figura,mapa,'#');
             imprimir(mapa);
             
-            inicio = std::chrono::system_clock::now();
+            inicio = std::chrono::steady_clock::now();
         }
         tiempo = 1000;
     }
