@@ -8,7 +8,7 @@ typedef std::array<std::array<char,10>,15> matriz;
 
 //Deberia de checar lo de hacer que no parpadee
 //De momento solo sirve para windows
-//Debo de hacer lo de que la x detecte si se puede mover o no sin importar la figura que tenga
+//Debo de arreglar lo de que la x detecte si se puede mover o no a la izquierda
 
 void rellenar(matriz& mapa)
 {
@@ -60,51 +60,175 @@ void conseguir_tecla(char& tecla)
 
 void cambiar_x(const int y, int& x, const std::array<int,4>& figura,const matriz& mapa, const char& tecla)
 {
-    bool sepuede = true;
-    int fila1,fila2,fila3;
-    if((tecla == 'a')&&(x > 0))
+    int contador;
+    if(tecla == 'd')
     {
-        if(figura[3]==9)
+        contador = 3;
+        if(figura[contador] == 9)
         {
-            if(mapa[y][x-1] != ' ') 
+            if(x<mapa[0].size()-5)
             {
-                sepuede = false;
-                return;
+                if (mapa[y][x+4]==' ') x++;
             }
-            else if(mapa[y-1][x-1] != ' ')
-            {
-                sepuede = false;
-                return;
-            }
-            else if(mapa[y-2][x-1] != ' ')
-            {
-                sepuede = false;
-                return;
-            }
-            else if(mapa[y-3][x-1] != ' ')
-            {
-                sepuede = false;
-                return;
-            }
+            return;
         }
-        else if(figura[3]==0)
+        if(x<mapa[0].size()-2)
         {
-            if(mapa[y][x-1]!=' ')
+            if((figura[contador] == 0))
             {
-                sepuede = false;
+                for(int i = 0; i < 4; i++) if(mapa[y+i][x+1] != ' ') return;
+                x++;
                 return;
             }
+            if(x < mapa[0].size()-3)
+            {
+                if(figura[contador] == 8)
+                {
+                    if(mapa[y+2][x+2] == ' ') contador--;
+                    else return;
+                }
+                else if (figura[contador] == 7)
+                {
+                    if(mapa[y+2][x+1] == ' ') contador--;
+                    else return;
+                }
+
+                while(true)
+                {
+                    if(figura[contador] < 7) break;
+                    contador--;
+                }
+
+                if(figura[contador] == 6)
+                {
+                    if(x < mapa[0].size()-4)
+                    {
+                        if(mapa[y+1][x+3] == ' ') contador--;
+                        else return;
+                    }
+                }
+                else if(figura[contador] == 5)
+                {
+                    if(mapa[y+1][x+2] == ' ') contador--;
+                    else return;
+                }
+                else if(figura[contador] == 4)
+                {
+                    if(mapa[y+1][x+1] == ' ') contador--;
+                    else return;
+                }
+
+                while(true)
+                {
+                    if(figura[contador] < 4) break;
+                    contador--;
+                }
+
+                if(figura[contador] == 3)
+                {
+                    if(x < mapa[0].size()-4)
+                    {
+                        if(mapa[y][x+3] == ' ') x++;
+                    }
+                }
+                else if((figura[contador] == 2) && (mapa[y][x+2] == ' ')) x++;
+                else if(mapa[y][x+1] == ' ') x++;
+                return;
+            }
+            else return;
         }
+        else return;
+    }
+    
+    else if(x > 0)
+    {
+        contador = 0;
+        if(figura[0]==1)
+        {
+            if(mapa[y][x-1]!=' ') return;
+            contador++;
+        }
+        else if(mapa[y][x]!=' ') return;
         else
         {
-            if()
+            if((figura[0]==3)&&(mapa[y][x+1]!=' ')) return;
+            contador++;
         }
         
-        if(mapa[y][x-1]==' ') x--;
-    }
-    else if((tecla == 'd')&&(x < mapa[0].size()-1))
-    {
-        if(mapa[y][x+1]) x++;
+        while(true)
+        {
+            if(figura[contador]>3)break;
+            contador++;
+        }
+        
+        if(figura[contador]==4)
+        {
+            if(mapa[y+1][x-1]!=' ') return;
+            if(contador==3)
+            {
+                x--;
+                return;    
+            }
+            contador++;
+        }
+        else if(figura[contador]==5)
+        {
+            if(contador==3)
+            {
+                if(figura[2]==4)
+                {
+                    if(mapa[y+1][x-1]==' ') x--;
+                }
+                else if(mapa[y+1][x]==' ') x--;
+                return;
+            }
+            else if((figura[contador-1]==4)&&(mapa[y+1][x-1]!=' ')) return;
+            else if(mapa[y+1][x]!=' ') return;
+            contador++;
+        }
+        if(figura[contador]==6)
+        {
+            if(figura[1]==4)
+            {
+                if(mapa[y+1][x-1]==' ') x--;
+            }
+            else if(mapa[y+1][x]==' ')
+            {
+                if((figura[2]==3)&&(mapa[y+1][x+1]==' '))x--;
+            }
+            return;
+        }
+        
+        while(true)
+        {
+            if(figura[contador]>6)break;
+            contador++;
+        }
+
+
+        if(figura[contador]==7)
+        {
+            if(contador==3)
+            {
+                if(mapa[y+2][x-1]== ' ') x--;
+                return;
+            }
+            else contador++;
+        }
+        if(figura[contador]==8)
+        {
+            if(contador==3)
+            {
+                if(figura[2]==7)
+                {
+                    if(mapa[y+2][x-1]==' ')x--;
+                }
+                else if(mapa[y+2][x]==' ') x--;
+                return;
+            }
+        }
+        if(mapa[y+3][x-1]==' ') x--;
+        return;
     }
 }
 
@@ -216,7 +340,7 @@ int main()
     
     linea = piso = false;
 
-    figura = {1,2,3,6};
+    figura = {1,2,5,6};
 
     y = 0;
     x = 5;
