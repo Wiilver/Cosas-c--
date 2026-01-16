@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 typedef std::array<std::array<char,10>,15> matriz;
+
 //Deberia de checar lo de hacer que no parpadee
 //De momento solo sirve para windows
 //Debo de hacer lo de que la x detecte si se puede mover o no sin importar la figura que tenga
@@ -59,17 +60,46 @@ void conseguir_tecla(char& tecla)
 
 void cambiar_x(const int y, int& x, const std::array<int,4>& figura,const matriz& mapa, const char& tecla)
 {
-    bool sepuede;
-    int cacho1;
+    bool sepuede = true;
+    int fila1,fila2,fila3;
     if((tecla == 'a')&&(x > 0))
     {
         if(figura[3]==9)
         {
-
+            if(mapa[y][x-1] != ' ') 
+            {
+                sepuede = false;
+                return;
+            }
+            else if(mapa[y-1][x-1] != ' ')
+            {
+                sepuede = false;
+                return;
+            }
+            else if(mapa[y-2][x-1] != ' ')
+            {
+                sepuede = false;
+                return;
+            }
+            else if(mapa[y-3][x-1] != ' ')
+            {
+                sepuede = false;
+                return;
+            }
         }
-        for(int i = 0; i < 3; i ++)
+        else if(figura[3]==0)
         {
+            if(mapa[y][x-1]!=' ')
+            {
+                sepuede = false;
+                return;
+            }
         }
+        else
+        {
+            if()
+        }
+        
         if(mapa[y][x-1]==' ') x--;
     }
     else if((tecla == 'd')&&(x < mapa[0].size()-1))
@@ -186,7 +216,7 @@ int main()
     
     linea = piso = false;
 
-    figura = {1,2,4,5};
+    figura = {1,2,3,6};
 
     y = 0;
     x = 5;
@@ -208,7 +238,7 @@ int main()
                 case 'a':
                 case 'd':
                     poner_figura(y,x,figura,mapa,' ');
-                    cambiar_x(y, x, mapa, tecla);
+                    cambiar_x(y, x,figura,mapa,tecla);
                     poner_figura(y,x,figura,mapa,'#');
 
                     system("cls");
