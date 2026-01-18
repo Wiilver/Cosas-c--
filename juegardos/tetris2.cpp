@@ -6,9 +6,10 @@
 
 typedef std::array<std::array<char,10>,15> matriz;
 
+//Las colisiones en y no sirven
 //Deberia de checar lo de hacer que no parpadee
 //De momento solo sirve para windows
-//Debo de arreglar lo de que la x detecte si se puede mover o no a la izquierda
+//Cosa curiosa, la derecha es una basura comparada con la izquierda
 
 void rellenar(matriz& mapa)
 {
@@ -143,103 +144,133 @@ void cambiar_x(const int y, int& x, const std::array<int,4>& figura,const matriz
     else if(x > 0)
     {
         contador = 0;
-        if(figura[0]==1)
-        {
-            if(mapa[y][x-1]!=' ') return;
-            contador++;
-        }
-        else if(mapa[y][x]!=' ') return;
-        else
-        {
-            if((figura[0]==3)&&(mapa[y][x+1]!=' ')) return;
-            contador++;
-        }
         
+        switch(figura[0])
+        {
+            case 1:
+            if(mapa[y][x-1]!=' ') return;
+            break;
+
+            case 2:
+            if(mapa[y][x]!=' ') return;
+            break;
+
+            case 3:
+            if(mapa[y][x+1]!=' ') return;
+            break;
+        }
+
         while(true)
         {
-            if(figura[contador]>3)break;
-            contador++;
-        }
-        
-        if(figura[contador]==4)
-        {
-            if(mapa[y+1][x-1]!=' ') return;
-            if(contador==3)
+            if(contador==4)
             {
                 x--;
-                return;    
-            }
-            contador++;
-        }
-        else if(figura[contador]==5)
-        {
-            if(contador==3)
-            {
-                if(figura[2]==4)
-                {
-                    if(mapa[y+1][x-1]==' ') x--;
-                }
-                else if(mapa[y+1][x]==' ') x--;
                 return;
             }
-            else if((figura[contador-1]==4)&&(mapa[y+1][x-1]!=' ')) return;
-            else if(mapa[y+1][x]!=' ') return;
+            if(figura[contador]>3) break;
             contador++;
-        }
-        if(figura[contador]==6)
-        {
-            if(figura[1]==4)
-            {
-                if(mapa[y+1][x-1]==' ') x--;
-            }
-            else if(mapa[y+1][x]==' ')
-            {
-                if((figura[2]==3)&&(mapa[y+1][x+1]==' '))x--;
-            }
-            return;
         }
         
+        switch(figura[contador])
+        {
+            case 4:
+            if(mapa[y+1][x-1]!=' ')return;
+            break;
+
+            case 5:
+            if(mapa[y+1][x]!= ' ')return;
+            break;
+
+            case 6:
+            if (mapa[y+1][x+1]==' ') x--;
+            return;
+            break;
+        }
+
+        if(contador==3)
+        {
+            x--;
+            return;
+        }
+
         while(true)
         {
-            if(figura[contador]>6)break;
+            if(contador==4)
+            {
+                x--;
+                return;
+            }
+            if(figura[contador]>6) break;
             contador++;
         }
 
+        switch(figura[contador])
+        {
+            case 7:
+            if(mapa[y+2][x-1]!=' ') return;
+            break;
 
-        if(figura[contador]==7)
-        {
-            if(contador==3)
-            {
-                if(mapa[y+2][x-1]== ' ') x--;
-                return;
-            }
-            else contador++;
+            case 8:
+            if(mapa[y+2][x]==' ')x--;
+            return;
+            break;
         }
-        if(figura[contador]==8)
+
+        if(contador==3)
         {
-            if(contador==3)
-            {
-                if(figura[2]==7)
-                {
-                    if(mapa[y+2][x-1]==' ')x--;
-                }
-                else if(mapa[y+2][x]==' ') x--;
-                return;
-            }
+            x--;
+            return;
         }
-        if(mapa[y+3][x-1]==' ') x--;
+        if(mapa[y+3][x-1]==' ')x--;
         return;
     }
 }
 
-void cambiar_y(int& y, const int x, bool& piso, const matriz& mapa)
+
+void cambiar_y(int& y, const int x, bool& piso, const std::array<int,4>& figura, const matriz& mapa)
 {
+    //Piso inicia en false siempre
+
+    if(y < mapa.size()-1)
+    {
+        int contador = 3;
+        if(figura[contador]==0)
+        {
+            if(y < mapa.size()-5)
+            {
+                if(mapa[y+4][x]==' ') y--;
+            }
+            else piso = true;
+            return;
+        }
+        if(figura[contador]==8)
+        {
+            if(y < mapa.size()-4)
+            {
+                if(mapa[y+3][x+1]!=' ')
+                {
+                    piso = true;
+                    return;
+                }
+                contador--;
+            }
+            else
+            {
+                piso = true;
+                return;
+            }
+        }
+
+    }
+    piso = true;
+    /*
     if (y < mapa.size()-1)
     {
         if(mapa[y+1][x] == ' ') y++;
         else piso = true;
     }
-    else piso = true;
+    piso = true;
+    */
 }
 
 void checar_linea(const int y, bool& linea, const matriz& mapa)
@@ -340,7 +371,7 @@ int main()
     
     linea = piso = false;
 
-    figura = {1,2,5,6};
+    figura = {2,4,5,8};
 
     y = 0;
     x = 5;
@@ -381,7 +412,7 @@ int main()
         {
             system("cls");
             poner_figura(y,x,figura,mapa,' ');
-            cambiar_y(y, x, piso, mapa);
+            cambiar_y(y, x, piso, figura, mapa);
             if(piso)
             {   
                 poner_figura(y,x,figura,mapa,'#');
