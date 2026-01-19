@@ -6,10 +6,11 @@
 
 typedef std::array<std::array<char,10>,15> matriz;
 
-//Las colisiones en y no sirven
+//Necesito usar un random y que cada vez te cambie la pieza, definiendo tambien las iniciales
 //Deberia de checar lo de hacer que no parpadee
 //De momento solo sirve para windows
 //Cosa curiosa, la derecha es una basura comparada con la izquierda
+//Dato aun mas curioso, las colisiones en y son la peor parte del codigo
 
 void rellenar(matriz& mapa)
 {
@@ -226,51 +227,149 @@ void cambiar_x(const int y, int& x, const std::array<int,4>& figura,const matriz
     }
 }
 
-
 void cambiar_y(int& y, const int x, bool& piso, const std::array<int,4>& figura, const matriz& mapa)
 {
     //Piso inicia en false siempre
-
-    if(y < mapa.size()-1)
+    
+    if(y == mapa.size()-1) 
     {
-        int contador = 3;
-        if(figura[contador]==0)
+        piso==true;
+        return;
+    }
+    int contador = 0;
+    bool salio = false;
+    
+    for(int i = figura.size()-1; i >= 0; i--)
+    {
+        if(salio) break;
+        switch(figura[i])
         {
-            if(y < mapa.size()-5)
-            {
-                if(mapa[y+4][x]==' ') y--;
-            }
-            else piso = true;
-            return;
-        }
-        if(figura[contador]==8)
-        {
-            if(y < mapa.size()-4)
-            {
-                if(mapa[y+3][x+1]!=' ')
+            case 0:
+                if(y > mapa.size()-5)
                 {
                     piso = true;
                     return;
                 }
-                contador--;
-            }
-            else
-            {
-                piso = true;
+                if(mapa[y+4][x]==' ') y++;
+                else piso = true;
                 return;
-            }
+            
+            case 7:
+                if(y > mapa.size()-4) 
+                {
+                    piso = true;
+                    return;
+                }
+                if(mapa[y+3][x]!=' ')
+                {
+                    piso = true;
+                    return;
+                }
+                salio = true;
+                break;
+            
+            case 4:
+                if(y > mapa.size()-3) 
+                {
+                    piso = true;
+                    return;
+                }
+                if(mapa[y+2][x]!=' ')
+                {
+                    piso = true;
+                    return;
+                }
+                salio = true;
+                break;
+            
+            case 1:
+                if(mapa[y+1][x]!=' ')
+                {
+                    piso = true;
+                    return;
+                }
+                salio = true;
+                break;
         }
+    }
 
-    }
-    piso = true;
-    /*
-    if (y < mapa.size()-1)
+    salio = false;
+
+    for(int i = figura.size()-1; i >= 0; i--)
     {
-        if(mapa[y+1][x] == ' ') y++;
-        else piso = true;
+        if(salio) break;
+        switch(figura[i])
+        {
+            case 8:
+                if(y > mapa.size()-4)
+                {
+                    piso = true;
+                    return;
+                }
+                if(mapa[y+3][x+1]==' ') y++;
+                else piso = true;
+                return;
+            
+            case 5:
+                if(y > mapa.size()-4) 
+                {
+                    piso = true;
+                    return;
+                }
+                if(mapa[y+2][x+1]!=' ')
+                {
+                    piso = true;
+                    return;
+                }
+                salio = true;
+                break;
+            
+            case 2:
+                if(mapa[y+1][x+1]!=' ')
+                {
+                    piso = true;
+                    return;
+                }
+                salio = true;
+                break;
+        }
     }
-    piso = true;
-    */
+    
+    salio = false;
+
+    for(int i = figura.size()-1; i >= 0; i--)
+    {
+        if(salio)break;
+
+        switch(figura[i])
+        {
+            case 6:
+                if (y > mapa.size()-3)
+                {
+                    piso = true;
+                    return;
+                }
+                if (mapa[y+2][x+2]==' ')y++;
+                else piso = true;
+                return;
+            case 3:
+                if(mapa[y+1][x+2]!=' ')
+                {
+                    piso = true;
+                    return;
+                }
+                salio = true;
+                break;
+            
+            case 9:
+                if(mapa[y+1][x+3]==' ')y++;
+                else piso = true;
+                //He de decir que esta linea de codigo me parece una estupidez
+                if(y == mapa.size()-1) piso = true;
+                return;
+        }
+    }
+    y++;
 }
 
 void checar_linea(const int y, bool& linea, const matriz& mapa)
@@ -371,7 +470,7 @@ int main()
     
     linea = piso = false;
 
-    figura = {2,4,5,8};
+    figura = {1,4,5,7};
 
     y = 0;
     x = 5;
