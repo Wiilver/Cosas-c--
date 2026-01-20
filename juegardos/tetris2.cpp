@@ -3,6 +3,7 @@
 #include <chrono>
 #include <conio.h>
 #include <cstdlib>
+#include <ctime>
 
 typedef std::array<std::array<char,10>,15> matriz;
 
@@ -457,6 +458,44 @@ void poner_figura(const int y, const int x, const std::array<int, 4>& figura, ma
     }
 }
 
+void generar_figura(std::array<int,4>& figura)
+{
+    srand(time(NULL));
+    int num = rand() % 7;
+
+    switch(num)
+    {
+        case 0:
+            figura = {1,2,4,5};
+            break;
+        
+        case 1:
+            figura = {2,4,5,6};
+            break;
+        
+        case 2:
+            figura = {1,2,5,6};
+            break;
+        
+        case 3:
+            figura = {2,3,4,5};
+            break;
+
+        case 4:
+            figura = {1,4,5,6};
+            break;
+        
+        case 5:
+            figura = {3,4,5,6};
+            break;
+
+        case 6:
+            figura = {1,2,3,9};
+            break;
+    }
+
+}
+
 int main()
 {
     int x, y, tiempo;
@@ -470,7 +509,7 @@ int main()
     
     linea = piso = false;
 
-    figura = {1,4,5,7};
+    figura = {1,2,3,9};
 
     y = 0;
     x = 5;
@@ -517,6 +556,7 @@ int main()
                 poner_figura(y,x,figura,mapa,'#');
                 checar_linea(y,linea,mapa);
                 if(linea)completo_linea(y, linea, mapa);
+                generar_figura(figura);
                 y = 0;
                 x = 5;
                 piso = false;
