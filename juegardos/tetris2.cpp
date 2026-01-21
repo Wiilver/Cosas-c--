@@ -7,7 +7,8 @@
 
 typedef std::array<std::array<char,10>,15> matriz;
 
-//Necesito usar un random y que cada vez te cambie la pieza, definiendo tambien las iniciales
+//Debo de terminar las rotaciones y de checar las que ya tenia hechas
+//Necesito volver a checar lo de checar linea
 //Deberia de checar lo de hacer que no parpadee
 //De momento solo sirve para windows
 //Cosa curiosa, la derecha es una basura comparada con la izquierda
@@ -312,7 +313,7 @@ void cambiar_y(int& y, const int x, bool& piso, const std::array<int,4>& figura,
                 return;
             
             case 5:
-                if(y > mapa.size()-4) 
+                if(y > mapa.size()-3) 
                 {
                     piso = true;
                     return;
@@ -496,6 +497,78 @@ void generar_figura(std::array<int,4>& figura)
 
 }
 
+void rotar_figura(int& x, int& y, std::array<int,4>& figura, const matriz& mapa)
+{
+    int temp_y, temp_x;
+    temp_y = y;
+    temp_x = x;
+
+    switch(figura[0])
+    {
+        case 1:
+            switch(figura[1])
+            {
+                case 2:
+                    switch(figura[2])
+                    {
+                        case 3:
+                            switch(figura[3])
+                            {
+                                case 4:
+                                    if(y > mapa.size()-3) return;
+                                    if((mapa[y+1][x+1]==' ')&&(mapa[y+2][x+1]==' ')) figura = {1,2,5,8};
+                                    break;
+                                case 5:
+
+                                    break;
+                                case 6:
+                                    if(y > mapa.size()-3) return;
+                                    break;
+                                case 9:
+                                    break;
+                            }
+                            break;
+                        case 4:
+                            break;
+                        case 5:
+                            if(figura[3]==6)
+                            {//falta
+                                return;
+                            }
+                            if(x > mapa.size()-2) return;
+                            if((mapa[y][x+2]==' ')&&(mapa[y+1][x+2]==' ')) figura = {3,4,5,6};
+                            break;
+                    }
+                    break;
+                case 4:
+                    if(figura[3]==5) return;
+                    if(x > mapa[0].size()-2) return;
+                    if((mapa[y][x+1]==' ')&&(mapa[y][x+2]==' ')) figura = {1,2,3,4};
+
+                    break;
+            }
+            break;
+        case 2:
+            switch(figura[1])
+            {
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+            }
+            break;
+        case 3:
+            if(y > mapa.size()-3) return; 
+            if((mapa[y][x+1]==' ')&&(mapa[y+2][x+1]==' ')&&(mapa[y+2][x+2]==' '))
+            {
+                figura = {1,4,7,8}; 
+            } 
+            break;
+    }
+}
+
 int main()
 {
     int x, y, tiempo;
@@ -509,7 +582,7 @@ int main()
     
     linea = piso = false;
 
-    figura = {1,2,3,9};
+    figura = {3,4,5,6};
 
     y = 0;
     x = 5;
@@ -528,6 +601,14 @@ int main()
             
             switch(tecla)
             {
+                case 'w':
+                    poner_figura(y,x,figura,mapa,' ');
+                    rotar_figura(x,y,figura,mapa);
+                    poner_figura(y,x,figura,mapa,'#');
+                    
+                    system("cls");
+                    imprimir(mapa);
+                    break;
                 case 'a':
                 case 'd':
                     poner_figura(y,x,figura,mapa,' ');
