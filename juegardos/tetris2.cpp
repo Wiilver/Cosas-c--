@@ -7,7 +7,8 @@
 
 typedef std::array<std::array<char,10>,15> matriz;
 
-//Debo de terminar las rotaciones y de checar las que ya tenia hechas
+//Hay un bug en las colisiones con x hacia la derecha
+//Las rotaciones se pueden optimizar
 //Necesito volver a checar lo de checar linea
 //Deberia de checar lo de hacer que no parpadee
 //De momento solo sirve para windows
@@ -515,36 +516,86 @@ void rotar_figura(int& x, int& y, std::array<int,4>& figura, const matriz& mapa)
                             switch(figura[3])
                             {
                                 case 4:
+                                //{1,2,3,4} L para abajo
                                     if(y > mapa.size()-3) return;
                                     if((mapa[y+1][x+1]==' ')&&(mapa[y+2][x+1]==' ')) figura = {1,2,5,8};
                                     break;
                                 case 5:
-
+                                //{1,2,3,5} Tetris para abajo
+                                    if(y > mapa.size()-3) return;
+                                    if((mapa[y+1][x]==' ')&&(mapa[y+2][x+1]==' ')) figura = {2,4,5,8};
                                     break;
                                 case 6:
+                                //{1,2,3,6} L invertida hacia abajo
                                     if(y > mapa.size()-3) return;
+                                    if((mapa[y+2][x]==' ')&&(mapa[y+2][x+1]==' ')) figura = {2,5,7,8};
                                     break;
                                 case 9:
+                                //{1,2,3,9} Linea acostada
+                                    if(y > mapa.size()-4) return;
+                                    if((mapa[y+1][x]==' ')&&(mapa[y+2][x]==' ')&&(mapa[y+3][x]==' ')) figura = {1,4,7,0};
                                     break;
                             }
                             break;
                         case 4:
+                        //{1,2,4,5} Cuadrado
+                            if(figura[3]==5)return;
+                        //{1,2,4,7} L invertida hacia arriba
+                            if(x > mapa[0].size()-2)return;
+                            if((mapa[y][x+2]==' ')&&(mapa[y+1][x+2]==' ')) figura = {1,2,3,6};
                             break;
                         case 5:
                             if(figura[3]==6)
-                            {//falta
+                            {//{1,2,5,6} S invertida
+                                if(y > mapa.size()-3) return;
+                                if((mapa[y+1][x]==' ')&&(mapa[y+2][x]==' ')) figura = {2,4,5,7};
                                 return;
                             }
+                            //{1,2,5,8} L boca arriba
                             if(x > mapa.size()-2) return;
-                            if((mapa[y][x+2]==' ')&&(mapa[y+1][x+2]==' ')) figura = {3,4,5,6};
+                            if((mapa[y][x+2]==' ')&&(mapa[y+1][x]==' ')&&(mapa[y+1][x+2]==' ')) figura = {3,4,5,6};
                             break;
                     }
                     break;
                 case 4:
-                    if(figura[3]==5) return;
-                    if(x > mapa[0].size()-2) return;
-                    if((mapa[y][x+1]==' ')&&(mapa[y][x+2]==' ')) figura = {1,2,3,4};
-
+                    switch(figura[2])
+                    {
+                        case 5:
+                            switch(figura[3])
+                            {
+                                case 6:
+                                //{1,4,5,6} L invertida boca arriba
+                                    if(y > mapa.size()-3) return;
+                                    if((mapa[y][x+1]==' ')&&(mapa[y+2][x]==' ')) figura = {1,2,4,7};
+                                    break;
+                                case 7:
+                                //{1,4,5,7} Tetris hacia la derecha
+                                    if(x > mapa[0].size()-2) return;
+                                    if((mapa[y][x+1]==' ')&&(mapa[y][x+2]==' ')) figura = {1,2,3,5};
+                                    break;
+                                case 8:
+                                //{1,4,5,8} S hacia arriba
+                                    if(x > mapa[0].size()-2) return;
+                                    if((mapa[y][x+1]==' ')&&(mapa[y][x+2]==' ')) figura = {2,3,4,5};
+                                    break;
+                            }
+                            break;
+                        case 7:
+                            switch(figura[3])
+                            {
+                                case 0:
+                                //{1,4,7,0} Linea vertical
+                                if(x > mapa[0].size()-3) return;
+                                if((mapa[y][x+1]==' ')&&(mapa[y][x+2]==' ')&&(mapa[y][x+3]==' ')) figura = {1,2,3,9};
+                                    break;
+                                case 8:
+                                //{1,4,7,8} L boca abajo
+                                    if(x > mapa[0].size()-2) return;
+                                    if((mapa[y][x+1]==' ')&&(mapa[y][x+2]==' ')) figura = {1,2,3,4};
+                                    break;
+                            }
+                            break;
+                    }
                     break;
             }
             break;
@@ -552,19 +603,41 @@ void rotar_figura(int& x, int& y, std::array<int,4>& figura, const matriz& mapa)
             switch(figura[1])
             {
                 case 3:
+                //{2,3,4,5} S
+                    if(y > mapa.size()-3)return;
+                    if((mapa[y][x]==' ')&&(mapa[y+2][x+1]==' ')) figura = {1,4,5,8};
                     break;
                 case 4:
+                    switch(figura[3])
+                    {
+                        case 6:
+                        //{2,4,5,6} Tetris hacia arriba
+                            if(y > mapa.size()-3)return;
+                            if((mapa[y][x]==' ')&&(mapa[y+2][x]==' ')) figura = {1,4,5,7};
+                            break;
+                        case 7:
+                        //{2,4,5,7} S invertida hacia arriba
+                            if(x > mapa[0].size()-2) return;
+                            if((mapa[y][x]==' ')&&(mapa[y+1][x+2]==' ')) figura = {1,2,5,6};
+                            break;
+                        case 8:
+                        //{2,4,5,8} Tetris hacia la derecha
+                            if(x > mapa[0].size()-2)return;
+                            if(mapa[y+1][x+2]==' ') figura = {2,4,5,6};
+                            break;
+                    }
                     break;
                 case 5:
+                //{2,5,7,8} L invertida hacia abajo
+                    if(x > mapa[0].size()-2) return;
+                    if((mapa[y][x]==' ')&&(mapa[y+1][x]==' ')&&(mapa[y+1][x+2]==' ')) figura = {1,4,5,6};
                     break;
             }
             break;
         case 3:
+        //{3,4,5,6} L boca abajo
             if(y > mapa.size()-3) return; 
-            if((mapa[y][x+1]==' ')&&(mapa[y+2][x+1]==' ')&&(mapa[y+2][x+2]==' '))
-            {
-                figura = {1,4,7,8}; 
-            } 
+            if((mapa[y][x]==' ')&&(mapa[y+2][x]==' ')&&(mapa[y+2][x+1]==' ')) figura = {1,4,7,8}; 
             break;
     }
 }
@@ -582,7 +655,7 @@ int main()
     
     linea = piso = false;
 
-    figura = {3,4,5,6};
+    figura = {1,4,7,0};
 
     y = 0;
     x = 5;
