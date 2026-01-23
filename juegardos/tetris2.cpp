@@ -7,10 +7,7 @@
 
 typedef std::array<std::array<char,10>,15> matriz;
 
-//Hay un bug en las colisiones con x hacia la derecha
 //Las rotaciones se pueden optimizar
-//Necesito volver a checar lo de checar linea
-//Deberia de checar lo de hacer que no parpadee
 //De momento solo sirve para windows
 //Cosa curiosa, la derecha es una basura comparada con la izquierda
 //Dato aun mas curioso, las colisiones en y son la peor parte del codigo
@@ -66,87 +63,93 @@ void conseguir_tecla(char& tecla)
 void cambiar_x(const int y, int& x, const std::array<int,4>& figura,const matriz& mapa, const char& tecla)
 {
     int contador;
-    if(tecla == 'd')
+
+    if(tecla=='d')
     {
-        contador = 3;
-        if(figura[contador] == 9)
+        if(x > mapa[0].size()-2) return;
+
+        if(figura[3]==0)
         {
-            if(x<mapa[0].size()-5)
-            {
-                if (mapa[y][x+4]==' ') x++;
-            }
+            for(int i = 0; i < 4; i++) if(mapa[y+i][x+1]!=' ') return;
+            x++;
             return;
         }
-        if(x<mapa[0].size()-2)
+
+        if(x > mapa[0].size()-3) return;
+
+        switch(figura[3])
         {
-            if((figura[contador] == 0))
+            case 9:
+                if(x > mapa[0].size()-5) return;
+                if(mapa[y][x+4]==' ') x++;
+                return;
+                break;
+            case 8:
+                if(mapa[y+2][x+2]!=' ') return;
+                break;
+            case 7:
+                if(mapa[y+2][x+1]!=' ') return;
+                break;
+        }
+
+        contador = 3;
+
+        while(true)
+        {
+            if(figura[contador] < 7) break;
+            if(contador == 0)
             {
-                for(int i = 0; i < 4; i++) if(mapa[y+i][x+1] != ' ') return;
                 x++;
                 return;
             }
-            if(x < mapa[0].size()-3)
+            contador --;
+        }
+
+        switch(figura[contador])
+        {
+            case 6:
+                if(x > mapa[0].size()-4) return;
+                if(mapa[y+1][x+3]!=' ') return;
+                break;
+            case 5:
+                if(mapa[y+1][x+2]!=' ') return;
+                break;
+            case 4:
+                if(mapa[y+1][x+1]!=' ') return;
+                break;
+        }
+        contador--;
+
+        while(true)
+        {
+            if(figura[contador] < 4) break;
+            if(contador == 0)
             {
-                if(figura[contador] == 8)
-                {
-                    if(mapa[y+2][x+2] == ' ') contador--;
-                    else return;
-                }
-                else if (figura[contador] == 7)
-                {
-                    if(mapa[y+2][x+1] == ' ') contador--;
-                    else return;
-                }
-
-                while(true)
-                {
-                    if(figura[contador] < 7) break;
-                    contador--;
-                }
-
-                if(figura[contador] == 6)
-                {
-                    if(x < mapa[0].size()-4)
-                    {
-                        if(mapa[y+1][x+3] == ' ') contador--;
-                        else return;
-                    }
-                }
-                else if(figura[contador] == 5)
-                {
-                    if(mapa[y+1][x+2] == ' ') contador--;
-                    else return;
-                }
-                else if(figura[contador] == 4)
-                {
-                    if(mapa[y+1][x+1] == ' ') contador--;
-                    else return;
-                }
-
-                while(true)
-                {
-                    if(figura[contador] < 4) break;
-                    contador--;
-                }
-
-                if(figura[contador] == 3)
-                {
-                    if(x < mapa[0].size()-4)
-                    {
-                        if(mapa[y][x+3] == ' ') x++;
-                    }
-                }
-                else if((figura[contador] == 2) && (mapa[y][x+2] == ' ')) x++;
-                else if(mapa[y][x+1] == ' ') x++;
+                x++;
                 return;
             }
-            else return;
+            contador --;
         }
-        else return;
+
+        switch(figura[contador])
+        {
+            case 3:
+                if(x > mapa[0].size()-4) return;
+                if(mapa[y][x+3]==' ')x++;
+                break;
+            case 2:
+                if(mapa[y][x+2]==' ')x++;
+                break;
+            case 1:
+                if(mapa[y][x+1]==' ') x++;
+                break;
+        }
+        return;
     }
     
-    else if(x > 0)
+    else if(tecla == 'a')
     {
+        if(x < 1) return;
         contador = 0;
         
         switch(figura[0])
@@ -370,32 +373,64 @@ void cambiar_y(int& y, const int x, bool& piso, const std::array<int,4>& figura,
                 //He de decir que esta linea de codigo me parece una estupidez
                 if(y == mapa.size()-1) piso = true;
                 return;
+            }
         }
+        y++;
     }
-    y++;
-}
-
-void checar_linea(const int y, bool& linea, const matriz& mapa)
+    
+void completo_linea(const int y, bool& linea, matriz& mapa)
+    {
+        linea = false;
+        for(int i = y; i > 0; i --)
+        {
+            mapa[i] = mapa[i-1];
+        }
+        for(int i = 0; i < mapa[0].size(); i ++) mapa [0][i] = ' ';
+    }
+    
+void checar_linea(const int y, bool& linea, const std::array<int,4>& figura, matriz& mapa)
 {
     linea = true;
-    for(int i = 0; i < mapa[0].size(); i++) 
-    {
-        if(mapa[y][i] == ' ')
-        {
-            linea = false;
-            break;
-        }
-    }
-}
 
-void completo_linea(const int y, bool& linea, matriz& mapa)
-{
-    linea = false;
-    for(int i = y; i > 0; i --)
+    int contador;
+
+    std::array<bool, 4> lineas = {false, false, false, false};
+
+    switch(figura[3])
     {
-        mapa[i] = mapa[i-1];
+        case 0:
+            contador = 4;
+            break;
+        case 7:
+        case 8:
+            contador = 3;
+            break;
+        case 4:
+        case 5:
+        case 6:
+            contador = 2;
+            break;
+        default:
+            contador = 1;
+            break;
     }
-    for(int i = 0; i < mapa[0].size(); i ++) mapa [0][i] = ' ';
+
+    for(int i = 0;  i < contador; i++)
+    {
+        for(int j = 0; j < mapa[0].size(); j++) 
+        {
+            if(mapa[y+i][j] == ' ')
+            {
+                linea = false;
+                break;
+            }
+        }
+        if(linea == true) lineas[i] = true;
+        else linea = true;
+    }
+    linea = false;
+    
+    for(int i = 0; i < lineas.size(); i++) if(lineas[i]) completo_linea(y+i,linea,mapa);
 }
 
 void poner_figura(const int y, const int x, const std::array<int, 4>& figura, matriz& mapa, char relleno)
@@ -541,7 +576,7 @@ void rotar_figura(int& x, int& y, std::array<int,4>& figura, const matriz& mapa)
                         //{1,2,4,5} Cuadrado
                             if(figura[3]==5)return;
                         //{1,2,4,7} L invertida hacia arriba
-                            if(x > mapa[0].size()-2)return;
+                            if(x > mapa[0].size()-3)return;
                             if((mapa[y][x+2]==' ')&&(mapa[y+1][x+2]==' ')) figura = {1,2,3,6};
                             break;
                         case 5:
@@ -552,7 +587,7 @@ void rotar_figura(int& x, int& y, std::array<int,4>& figura, const matriz& mapa)
                                 return;
                             }
                             //{1,2,5,8} L boca arriba
-                            if(x > mapa.size()-2) return;
+                            if(x > mapa[0].size()-3) return;
                             if((mapa[y][x+2]==' ')&&(mapa[y+1][x]==' ')&&(mapa[y+1][x+2]==' ')) figura = {3,4,5,6};
                             break;
                     }
@@ -570,12 +605,12 @@ void rotar_figura(int& x, int& y, std::array<int,4>& figura, const matriz& mapa)
                                     break;
                                 case 7:
                                 //{1,4,5,7} Tetris hacia la derecha
-                                    if(x > mapa[0].size()-2) return;
+                                    if(x > mapa[0].size()-3) return;
                                     if((mapa[y][x+1]==' ')&&(mapa[y][x+2]==' ')) figura = {1,2,3,5};
                                     break;
                                 case 8:
                                 //{1,4,5,8} S hacia arriba
-                                    if(x > mapa[0].size()-2) return;
+                                    if(x > mapa[0].size()-3) return;
                                     if((mapa[y][x+1]==' ')&&(mapa[y][x+2]==' ')) figura = {2,3,4,5};
                                     break;
                             }
@@ -585,12 +620,12 @@ void rotar_figura(int& x, int& y, std::array<int,4>& figura, const matriz& mapa)
                             {
                                 case 0:
                                 //{1,4,7,0} Linea vertical
-                                if(x > mapa[0].size()-3) return;
+                                if(x > mapa[0].size()-4) return;
                                 if((mapa[y][x+1]==' ')&&(mapa[y][x+2]==' ')&&(mapa[y][x+3]==' ')) figura = {1,2,3,9};
                                     break;
                                 case 8:
                                 //{1,4,7,8} L boca abajo
-                                    if(x > mapa[0].size()-2) return;
+                                    if(x > mapa[0].size()-3) return;
                                     if((mapa[y][x+1]==' ')&&(mapa[y][x+2]==' ')) figura = {1,2,3,4};
                                     break;
                             }
@@ -617,19 +652,19 @@ void rotar_figura(int& x, int& y, std::array<int,4>& figura, const matriz& mapa)
                             break;
                         case 7:
                         //{2,4,5,7} S invertida hacia arriba
-                            if(x > mapa[0].size()-2) return;
+                            if(x > mapa[0].size()-3) return;
                             if((mapa[y][x]==' ')&&(mapa[y+1][x+2]==' ')) figura = {1,2,5,6};
                             break;
                         case 8:
                         //{2,4,5,8} Tetris hacia la derecha
-                            if(x > mapa[0].size()-2)return;
+                            if(x > mapa[0].size()-3)return;
                             if(mapa[y+1][x+2]==' ') figura = {2,4,5,6};
                             break;
                     }
                     break;
                 case 5:
                 //{2,5,7,8} L invertida hacia abajo
-                    if(x > mapa[0].size()-2) return;
+                    if(x > mapa[0].size()-3) return;
                     if((mapa[y][x]==' ')&&(mapa[y+1][x]==' ')&&(mapa[y+1][x+2]==' ')) figura = {1,4,5,6};
                     break;
             }
@@ -655,7 +690,7 @@ int main()
     
     linea = piso = false;
 
-    figura = {1,4,7,0};
+    figura = {1,2,3,9};
 
     y = 0;
     x = 5;
@@ -707,9 +742,10 @@ int main()
             cambiar_y(y, x, piso, figura, mapa);
             if(piso)
             {   
+                if(y==0)break;
                 poner_figura(y,x,figura,mapa,'#');
-                checar_linea(y,linea,mapa);
-                if(linea)completo_linea(y, linea, mapa);
+                checar_linea(y,linea,figura,mapa);
+                if((y==0)&&(linea))completo_linea(y, linea, mapa);
                 generar_figura(figura);
                 y = 0;
                 x = 5;
@@ -722,8 +758,6 @@ int main()
         }
         tiempo = 1000;
     }
-    
-    
-    
+    std::cout<<"perdiste";
     return 0;
 }
