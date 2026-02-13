@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <conio.h>
+#include <windows.h>
 //#include <fstream> Esta es la libreria para manejo de archivos
 
 bool checar_num(std::string cadena)
@@ -50,14 +52,91 @@ std::vector<std::vector<std::string>> crear_lienzo(const int Y, const int X)
     return matriz;
 }
 
+std::string escojer_personaje()
+{
+    char chr;
+    
+    std::cout<<"Por favor, ingrese cual quiere que sea su personaje, esto puede ser cambiado posteriormente : ";
+    std::cin>>chr;
+    
+    std::string str = " ";
+    str+=chr;
+    str+=" ";
+    return str;
+}
+
 void editor()
 {
+    std::string personaje = escojer_personaje();
+
     const int Y_LIENZO = dimensiones('Y');
     const int X_LIENZO = dimensiones('X');
     std::vector<std::vector<std::string>> lienzo = crear_lienzo(Y_LIENZO, X_LIENZO);
-    impresion(lienzo);
-}
+    
+    int y = Y_LIENZO/2;
+    int x = X_LIENZO/2;
 
+    
+    lienzo[y][x] = personaje;
+    
+    while(true)
+    {
+        char tecla = ' ';
+        if(_kbhit())
+        {
+            lienzo[y][x] = " - ";
+
+            int input = _getch();
+            if((input == 0)||(input == 224)) input = _getch();
+
+            switch(input)
+            {
+                case 119:
+                case 87:
+                case 72:
+                    tecla = 'w';
+                    break;
+
+                case 97:
+                case 65:
+                case 75:
+                    tecla = 'a';
+                    break;
+                
+                case 115:
+                case 83:
+                case 80:
+                    tecla = 's';
+                    break;
+
+                case 100:
+                case 68:
+                case 77:
+                    tecla = 'd';
+                    break;
+            }
+            
+            switch(tecla)
+            {
+                case 'w':
+                    y--;
+                    break;
+                case 'a':
+                    x--;
+                    break;
+                case 's':
+                    y++;
+                    break;
+                case 'd':
+                    x++;
+                    break;
+            }
+            lienzo[y][x] = personaje;
+            system("cls");
+            impresion(lienzo);
+        }
+    }
+}
 
 int main()
 {
