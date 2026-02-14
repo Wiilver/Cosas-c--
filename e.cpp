@@ -3,6 +3,8 @@
 #include <conio.h>
 #include <windows.h>
 //#include <fstream> Esta es la libreria para manejo de archivos
+//"═╣ ", " ║ ", "═╗ ", "═╝ ", " ╚═", " ╔═", "═╩═", "═╦═", " ╠═", "═══", "═╬═"
+
 
 bool checar_num(std::string cadena)
 {
@@ -34,9 +36,42 @@ int dimensiones(char dim)
 
 void impresion(const std::vector<std::vector<std::string>>& matriz)
 {
-    for(int i = 0; i < matriz.size(); i++)
+    for(int i = 0; i < matriz.size()+2; i++)
     {
-        for(int j = 0; j < matriz[0].size(); j++) std::cout<<matriz[i][j];
+        for(int j = 0; j < matriz[0].size()+2; j++)
+        {
+            if((j==0)&&(i==0))
+            {
+                std::cout<<" ╔═";
+                continue;
+            }
+            else if((j==0)&&(i==matriz.size()+1))
+            {
+                std::cout<<" ╚═";
+                continue;
+            }
+            else if((j==matriz[0].size()+1)&&(i==0))
+            {
+                std::cout<<"═╗ ";
+                continue;
+            }
+            else if((j==matriz[0].size()+1)&&(i==matriz.size()+1))
+            {
+                std::cout<<"═╝ ";
+                continue;
+            }
+            else if((i == 0)||(i == matriz.size()+1))
+            {
+                std::cout<<"═══";
+                continue;
+            }
+            else if((j==0)||(j==matriz[0].size()+1))
+            {
+                std::cout<<" ║ ";
+                continue;
+            }
+            else std::cout<<matriz[i-1][j-1];
+        }
         std::cout<<'\n';
     }
 }
@@ -54,20 +89,83 @@ std::vector<std::vector<std::string>> crear_lienzo(const int Y, const int X)
 
 std::string escojer_personaje()
 {
-    char chr;
+    std::string str;
     
-    std::cout<<"Por favor, ingrese cual quiere que sea su personaje, esto puede ser cambiado posteriormente : ";
-    std::cin>>chr;
-    
-    std::string str = " ";
-    str+=chr;
-    str+=" ";
+    while(true)
+    {
+        std::cout<<"Vamos a crear un personaje, ingresa de 1 a 3 caracteres\n";
+        std::cout<<"Esto puede ser cambiado posteriormente : ";
+        std::cin>>str;
+        
+        if(str.size() == 3) return str;
+        if(str.size() == 1) return " " + str + " ";
+        estupido();
+    }
+
     return str;
+}
+
+char conseguir_tecla(){
+    char tecla;
+    int input = _getch();
+    if((input == 0)||(input == 224)) input = _getch();
+
+    switch(input)
+    {
+        case 119:
+        case 87:
+        case 72:
+            tecla = 'w';
+            break;
+
+        case 97:
+        case 65:
+        case 75:
+            tecla = 'a';
+            break;
+        
+        case 115:
+        case 83:
+        case 80:
+            tecla = 's';
+            break;
+
+        case 100:
+        case 68:
+        case 77:
+            tecla = 'd';
+            break;
+    }
+    
+    return tecla;
+}
+
+void cambiar_coord(int& x, int& y, const int x_lim, const int y_lim, const char tecla)
+{
+    switch(tecla)
+    {
+        case 'w':
+            if(y > 0) y--;
+            break;
+        case 'a':
+            if(x > 0) x--;
+            break;
+        case 's':
+            if(y < y_lim-1) y++;
+            break;
+        case 'd':
+            if(x < x_lim-1) x++;
+            break;
+    }
 }
 
 void editor()
 {
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+
     std::string personaje = escojer_personaje();
+    std::cout<<'\n';
 
     const int Y_LIENZO = dimensiones('Y');
     const int X_LIENZO = dimensiones('X');
@@ -76,64 +174,30 @@ void editor()
     int y = Y_LIENZO/2;
     int x = X_LIENZO/2;
 
-    
     lienzo[y][x] = personaje;
     
+    system("cls");
+    impresion(lienzo);
+
     while(true)
     {
         char tecla = ' ';
         if(_kbhit())
         {
-            lienzo[y][x] = " - ";
-
-            int input = _getch();
-            if((input == 0)||(input == 224)) input = _getch();
-
-            switch(input)
-            {
-                case 119:
-                case 87:
-                case 72:
-                    tecla = 'w';
-                    break;
-
-                case 97:
-                case 65:
-                case 75:
-                    tecla = 'a';
-                    break;
-                
-                case 115:
-                case 83:
-                case 80:
-                    tecla = 's';
-                    break;
-
-                case 100:
-                case 68:
-                case 77:
-                    tecla = 'd';
-                    break;
-            }
-            
+            tecla = conseguir_tecla();
             switch(tecla)
             {
                 case 'w':
-                    y--;
-                    break;
                 case 'a':
-                    x--;
-                    break;
                 case 's':
-                    y++;
-                    break;
                 case 'd':
-                    x++;
+                    lienzo[y][x] = " - ";
+                    cambiar_coord(x, y, X_LIENZO, Y_LIENZO, tecla);
+                    lienzo[y][x] = personaje;
+                    system("cls");
+                    impresion(lienzo);
                     break;
             }
-            lienzo[y][x] = personaje;
-            system("cls");
-            impresion(lienzo);
         }
     }
 }
