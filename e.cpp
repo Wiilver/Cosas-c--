@@ -2,6 +2,7 @@
 #include <vector>
 #include <conio.h>
 #include <windows.h>
+#include <cctype>
 //#include <fstream> Esta es la libreria para manejo de archivos
 //"═╣ ", " ║ ", "═╗ ", "═╝ ", " ╚═", " ╔═", "═╩═", "═╦═", " ╠═", "═══", "═╬═"
 
@@ -78,7 +79,7 @@ void impresion(const std::vector<std::vector<std::string>>& matriz)
 
 std::vector<std::vector<std::string>> crear_lienzo(const int Y, const int X)
 {
-    std::string car = " - ";
+    std::string car = "   ";
     std::vector<std::string> vector;
     std::vector<std::vector<std::string>> matriz;
     
@@ -126,7 +127,6 @@ char conseguir_tecla(){
         
         case 115:
         case 83:
-        case 80:
             tecla = 's';
             break;
 
@@ -134,6 +134,23 @@ char conseguir_tecla(){
         case 68:
         case 77:
             tecla = 'd';
+            break;
+
+        case 112:
+        case 80:
+            tecla = 'p';
+            break;
+
+        case 8:
+            tecla = '0';
+            break;
+
+        case 13:
+            tecla = '1';
+            break;
+
+        case 27:
+            tecla = '2';
             break;
     }
     
@@ -159,22 +176,37 @@ void cambiar_coord(int& x, int& y, const int x_lim, const int y_lim, const char 
     }
 }
 
+bool menu_salir(){
+    while(true){
+        char resp;
+        std::cout<<"Estas seguro de querer salir (S/N)? : ";
+        std::cin>>resp;
+        resp = std::toupper(resp);
+        if((resp=='S')||(resp=='N')) return (resp == 'S') ? true : false;
+        estupido();
+    }
+}
+
 void editor()
 {
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
+    
+    bool salir = false;
 
+    std::string anterior = "   ";
+    std::string material = " - ";
     std::string personaje = escojer_personaje();
     std::cout<<'\n';
 
     const int Y_LIENZO = dimensiones('Y');
     const int X_LIENZO = dimensiones('X');
-    std::vector<std::vector<std::string>> lienzo = crear_lienzo(Y_LIENZO, X_LIENZO);
-    
     int y = Y_LIENZO/2;
     int x = X_LIENZO/2;
+    
+    std::vector<std::vector<std::string>> lienzo = crear_lienzo(Y_LIENZO, X_LIENZO);
 
-    lienzo[y][x] = personaje;
+    lienzo[y][x] = material;
     
     system("cls");
     impresion(lienzo);
@@ -191,14 +223,31 @@ void editor()
                 case 'a':
                 case 's':
                 case 'd':
-                    lienzo[y][x] = " - ";
+                    lienzo[y][x] = anterior;
                     cambiar_coord(x, y, X_LIENZO, Y_LIENZO, tecla);
-                    lienzo[y][x] = personaje;
+                    anterior = lienzo[y][x];
+                    lienzo[y][x] = material;
                     system("cls");
                     impresion(lienzo);
                     break;
+                case 'p':
+                    personaje = escojer_personaje();
+                    break;
+                case '0':
+                    anterior = "   ";
+                    break;
+                case '1':
+                    anterior = material;
+                    lienzo[y][x] = material;
+                    system("cls");
+                    impresion(lienzo);
+                    break;
+                case '2':
+                    salir = menu_salir();
+                    break;
             }
         }
+        if(salir) break;
     }
 }
 
