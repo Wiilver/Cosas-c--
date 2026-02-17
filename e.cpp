@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <array>
 #include <conio.h>
 #include <windows.h>
 #include <cctype>
@@ -132,13 +133,17 @@ char conseguir_tecla(){
 
         case 100:
         case 68:
-        case 77:
             tecla = 'd';
             break;
 
         case 112:
         case 80:
             tecla = 'p';
+            break;
+
+        case 109:
+        case 77:
+            tecla = 'm';
             break;
 
         case 8:
@@ -176,6 +181,79 @@ void cambiar_coord(int& x, int& y, const int x_lim, const int y_lim, const char 
     }
 }
 
+void menu_materiales(const std::vector<std::string>& usuario, std::string& material){
+    std::string resp;
+    system("cls");
+    while(true)
+    {
+        std::cout<<
+        "Seleccione una de las siguientes opciones:\n"<<
+        "1.- Lineas simples\n"<<
+        "2.- Lineas dobles\n"<<
+        "3.- Texturas\n"<<
+        "4.- Bloques\n"<<
+        "5.- Del usuario\n"<<
+        "6.- Otros\n"<<
+        "7.- Cancelar\n"<<
+        "Opcion : ";
+        std::cin>>resp;
+        if(checar_num(resp))break;
+        estupido();
+    }
+    int num = std::stoi(resp);
+    system("cls");
+    std::vector<std::string> materiales;
+    switch(num)
+    {
+        case 1:
+            materiales = {" ┌─","─┘ ","─┐ ", " └─", "─┴─", "─┬─", " ├─", "───", "─┼─", "─┤ ", " │ "};
+            break;
+        case 2:
+            materiales = {"═╣ ", " ║ ", "═╗ ", "═╝ ", " ╚═", " ╔═", "═╩═", "═╦═", " ╠═", "═══", "═╬═"};
+            break;
+        case 3:
+            materiales = {"░░░", "▒▒▒", "▓▓▓", " ░ ", " ▒ ", " ▓ "};
+            break;
+        case 4:
+            materiales = {"███", " █ "," ▄ ", " ▀ ", " ■ "};
+            break;
+        case 5:
+            if(usuario.size()==0)
+            {
+                std::cout<<"Parece que aun no tienes materiales creados, saldras de este menu";
+                return;
+            }
+            materiales = usuario;
+            break;
+        case 6:
+            materiales = {" ≡ ", " ¦ ", " ¤ ", " O "};
+            break;
+        case 7:
+            return;
+    }
+    while(true)
+    {
+        try
+        {
+            std::cout<<"Por favor, seleccione uno de estos materiales\n\n";
+            for(int i = 0; i < materiales.size(); i++) std::cout<<i+1<<".- "<<materiales[i]<<'\n';
+            std::cout<<materiales.size()+1<<".- Cancelar\n";
+            std::cout<<"\nOpcion : ";
+            std::cin>>num;
+            if(num==materiales.size()+1) return;
+            else if((num > 0) && (num <= materiales.size()))
+            {
+                material = materiales[num-1];
+                return;
+            }
+        }
+        catch(...)
+        {
+            estupido();
+        }
+    }
+}
+
 bool menu_salir(){
     while(true){
         char resp;
@@ -193,6 +271,9 @@ void editor()
     SetConsoleCP(CP_UTF8);
     
     bool salir = false;
+
+    
+    std::vector<std::string> usuario = {};
 
     std::string anterior = "   ";
     std::string material = " - ";
@@ -219,16 +300,18 @@ void editor()
             tecla = conseguir_tecla();
             switch(tecla)
             {
-                case 'w':
                 case 'a':
-                case 's':
                 case 'd':
+                case 's':
+                case 'w':
                     lienzo[y][x] = anterior;
                     cambiar_coord(x, y, X_LIENZO, Y_LIENZO, tecla);
                     anterior = lienzo[y][x];
                     lienzo[y][x] = material;
                     system("cls");
-                    impresion(lienzo);
+                    break;
+                case 'm':
+                    menu_materiales(usuario, material);
                     break;
                 case 'p':
                     personaje = escojer_personaje();
@@ -240,12 +323,12 @@ void editor()
                     anterior = material;
                     lienzo[y][x] = material;
                     system("cls");
-                    impresion(lienzo);
                     break;
                 case '2':
                     salir = menu_salir();
                     break;
             }
+            impresion(lienzo);
         }
         if(salir) break;
     }
