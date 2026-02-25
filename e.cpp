@@ -4,6 +4,7 @@
 #include <conio.h>
 #include <windows.h>
 #include <cctype>
+#include <map>
 //#include <fstream> Esta es la libreria para manejo de archivos
 //"═╣ ", " ║ ", "═╗ ", "═╝ ", " ╚═", " ╔═", "═╩═", "═╦═", " ╠═", "═══", "═╬═"
 
@@ -90,8 +91,6 @@ void impresion(const std::vector<std::vector<std::string>>& matriz, const std::v
             }
             else
             {
-                
-
                 cactual = lista_colores[color[i-1][j-1]];
                 factual = lista_fondos[fondo[i-1][j-1]];
                 std::cout<<cactual<<factual<<matriz[i-1][j-1]<<"\033[0m";
@@ -195,6 +194,16 @@ char conseguir_tecla(){
             tecla = 'n';
             break;
 
+        case 81:
+        case 113:
+            tecla = 'q';
+            break;
+        
+        case 84:
+        case 116:
+            tecla = 't';
+            break;
+
         case 39:
         case 63:
         case 168:
@@ -232,6 +241,41 @@ void cambiar_coord(int& x, int& y, const int x_lim, const int y_lim, const char 
             break;
         case 'd':
             if(x < x_lim-1) x++;
+            break;
+    }
+}
+
+void cambiar_coord_juego(int& x, int& y, const int x_lim, const int y_lim, const char tecla, const std::vector<std::vector<std::string>>& tipos)
+{
+    switch(tecla)
+    {
+        case 'w':
+            if(y > 0)
+            {
+                if(tipos[y-1][x]=="pared") return;
+                y--;
+            }
+            break;
+        case 'a':
+            if(x > 0)
+            {
+                if(tipos[y][x-1]=="pared") return;
+                x--;
+            }
+            break;
+        case 's':
+            if(y < y_lim-1)
+            {
+                if(tipos[y+1][x]=="pared") return;
+                y++;
+            }
+            break;
+        case 'd':
+            if(x < x_lim-1)
+            {
+                if(tipos[y][x+1]=="pared") return;
+                x++;
+            }
             break;
     }
 }
@@ -379,6 +423,90 @@ bool menu_salir(){
     }
 }
 
+void menu_tipos(std::string& tipo)
+{
+    std::string str;
+    int num;
+    system("cls");
+    while(true)
+    {
+        std::cout<<
+        "1.- Pared\n"<<
+        "2.- Texto\n"<<
+        "3.- Interaccion"
+        "4.- Npc\n"<<
+        "5.- Cambiar pantalla\n"<<
+        "6.- Punto de inicio\n"<<
+        "7.- Nulo\n"<<
+        "8.- Cancelar\n"<<
+        "Opcion : ";
+        std::cin>>str;
+        if(checar_num(str))
+        {
+            num = std::stoi(str);
+            if((num > 0)&&(num < 9)) break;
+        }
+        estupido();
+    }
+    switch(num)
+    {
+        case 1:
+            tipo = "pared";
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        case 7:
+            tipo = "   ";
+            break;
+        case 8:
+            break;
+    }
+    
+}
+
+void nuevo_texto(std::map<std::string, std::vector<std::string>>& dialogos)
+{
+
+}
+
+void menu_textos(std::map<std::string, std::vector<std::string>>& dialogos, std::string& tipo)
+{
+    char chr;
+    std::string str;
+    int num;
+    system("cls");
+
+    if(dialogos.size() == 0)
+    {
+        while(true)
+        {
+            try
+            {
+                std::cout<<"Parece que no tienes ningun texto creado, deseas crear uno nuevo (S/N)? : ";
+                std::cin>>chr;
+                chr = std::toupper(chr);
+                if((chr=='S')||(chr=='N')) break;
+                estupido();
+            }
+            catch(...)
+            {
+                estupido();
+            }
+        }
+        if(chr == 'N') return;
+        nuevo_texto(dialogos);
+    }
+
+}
+
 void ayuda()
 {
     char c;
@@ -401,13 +529,12 @@ void editor()
     SetConsoleCP(CP_UTF8);
     
     bool salir = false;
-    int color = 0;
-    int ant_color = 0;
-    int fondo = 0;
-    int ant_fondo = 0;
-    
+    bool juego = false;
+
     std::vector<std::string> usuario = {};
 
+    std::string ant_tipo = "   ";
+    std::string tipo = "   ";
     std::string anterior = "   ";
     std::string material = " - ";
     std::string personaje = escojer_personaje();
@@ -417,10 +544,18 @@ void editor()
     const int X_LIENZO = dimensiones('X');
     int y = Y_LIENZO/2;
     int x = X_LIENZO/2;
-
+    int color = 0;
+    int ant_color = 0;
+    int fondo = 0;
+    int ant_fondo = 0;
+    
     std::vector<std::vector<std::string>> lienzo = crear_lienzo(Y_LIENZO, X_LIENZO);
+    std::vector<std::vector<std::string>> tipos = crear_lienzo(Y_LIENZO, X_LIENZO);
     std::vector<std::vector<int>> colores = crear_matriz(Y_LIENZO,X_LIENZO);
     std::vector<std::vector<int>> fondos = crear_matriz(Y_LIENZO,X_LIENZO);
+    
+    std::map <std::string, std::vector<std::string>> dialogos;
+
     lienzo[y][x] = material;
     
     system("cls");
@@ -432,67 +567,107 @@ void editor()
         if(_kbhit())
         {
             tecla = conseguir_tecla();
-            switch(tecla)
+            if(juego)
             {
-                case 'a':
-                case 'd':
-                case 's':
-                case 'w':
-                    fondos[y][x] = ant_fondo;
-                    colores[y][x] = ant_color;
-                    lienzo[y][x] = anterior;
-                    cambiar_coord(x, y, X_LIENZO, Y_LIENZO, tecla);
-                    anterior = lienzo[y][x];
-                    ant_color = colores[y][x];
-                    ant_fondo = fondos[y][x];
-                    lienzo[y][x] = material;
-                    colores[y][x] = color;
-                    fondos[y][x] = fondo;
-                    break;
-                case 'c':
-                    menu_colores(color);
-                    break;
-                case 'f':
-                    menu_colores(fondo);
-                    break;
-                case 'm':
-                    menu_materiales(usuario, material);
-                    break;
-                case 'n':
-                    nuevo_material(usuario);
-                    break;
-                case 'p':
-                    personaje = escojer_personaje();
-                    break;
-                case '0':
-                    anterior = "   ";
-                    ant_color = 0;
-                    ant_fondo = 0;
-                    break;
-                case '1':
-                    anterior = material;
-                    lienzo[y][x] = material;
-                    ant_color = color;
-                    colores[y][x] = color;
-                    ant_fondo = fondo;
-                    fondos[y][x] = fondo;
-                    break;
-                case '2':
-                    salir = menu_salir();
-                    break;
-                case '?':
-                    ayuda();
-                    break;
-                case ' ':
-                    break;
+                switch(tecla)
+                {
+                    case 'a':
+                    case 'd':
+                    case 's':
+                    case 'w':
+                        fondos[y][x] = ant_fondo;
+                        colores[y][x] = ant_color;
+                        lienzo[y][x] = anterior;
+                        cambiar_coord_juego(x, y, X_LIENZO, Y_LIENZO, tecla, tipos);
+                        anterior = lienzo[y][x];
+                        ant_color = colores[y][x];
+                        ant_fondo = fondos[y][x];
+                        lienzo[y][x] = personaje;
+                        colores[y][x] = color;
+                        fondos[y][x] = fondo;
+                        break;
+
+                    case 'q':
+                        juego = false;
+                        break;
+                }
             }
-            system("cls");
-            impresion(lienzo, colores, fondos);
-        }
-        if(salir) 
-        {
-            system("cls");
-            break;
+            else
+            {
+                switch(tecla)
+                {
+                    case 'a':
+                    case 'd':
+                    case 's':
+                    case 'w':
+                        lienzo[y][x] = anterior;
+                        fondos[y][x] = ant_fondo;
+                        colores[y][x] = ant_color;
+                        tipos[y][x] = ant_tipo;
+                        cambiar_coord(x, y, X_LIENZO, Y_LIENZO, tecla);
+                        anterior = lienzo[y][x];
+                        ant_color = colores[y][x];
+                        ant_fondo = fondos[y][x];
+                        ant_tipo = tipos[y][x];
+                        lienzo[y][x] = material;
+                        colores[y][x] = color;
+                        fondos[y][x] = fondo;
+                        tipos[y][x] = tipo;
+                        break;
+                    case 'c':
+                        menu_colores(color);
+                        break;
+                    case 'f':
+                        menu_colores(fondo);
+                        break;
+                    case 'm':
+                        menu_materiales(usuario, material);
+                        break;
+                    case 'n':
+                        nuevo_material(usuario);
+                        break;
+                    case 'p':
+                        personaje = escojer_personaje();
+                        break;
+                    case 'q':
+                        juego = true;
+                        break;
+                    case 't':
+                        menu_tipos(tipo);
+                        break;
+                    case '0':
+                        anterior = "   ";
+                        ant_color = 0;
+                        ant_fondo = 0;
+                        ant_tipo = "   ";
+                        break;
+                    case '1':
+                        anterior = material;
+                        lienzo[y][x] = material;
+                        ant_color = color;
+                        colores[y][x] = color;
+                        ant_fondo = fondo;
+                        fondos[y][x] = fondo;
+                        ant_tipo = tipo;
+                        tipos[y][x] = tipo;
+                        break;
+                    case '2':
+                        salir = menu_salir();
+                        break;
+                    case '?':
+                        ayuda();
+                        break;
+                    case ' ':
+                        break;
+                }
+            }
+                system("cls");
+                impresion(lienzo, colores, fondos);
+            }
+            if(salir) 
+            {
+                system("cls");
+                break;
         }
     }
 }
